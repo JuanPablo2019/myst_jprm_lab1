@@ -92,5 +92,31 @@ def f_descriptive_ob(data_ob:dict) -> dict:
     
     return r_data
 
+def transaction_vol_pt(pt_data):
+    n_pt_data = pt_data['side'].resample('60T').count()
+    return n_pt_data
+
+def asset_volume_pt(pt_data):
+    v_pt_data = pt_data['amount'].resample('60T').sum()
+    return v_pt_data    
+
+def ohlc(pt_data,n_pt_data,v_pt_data):
+    ohlc = pd.DataFrame()
+
+    ohlc['Hour'] = pt_data['price'].resample('60T').last().index
+    ohlc['Opening'] = pt_data['price'].resample('60T').first().values
+    ohlc['Close'] = pt_data['price'].resample('60T').last().values
+    ohlc['Max'] = pt_data['price'].resample('60T').max().values
+    ohlc['Min'] = pt_data['price'].resample('60T').min().values
+    ohlc['Transaction Volume']=n_pt_data.values
+    ohlc['Asset Volume']=v_pt_data.values
+    
+    return ohlc
+
+def td_imb_pt(pt_data):
+    pt_data2 = pt_data
+    pt_data2['amount']=[j*-1 if i == 'sell' else j for i,j in zip(pt_data2['side'],pt_data2['amount'])]
+    td_imb = pt_data2['amount'].resample('60T').sum()
+    return td_imb
 
 
