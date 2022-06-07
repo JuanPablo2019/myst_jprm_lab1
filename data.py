@@ -1,12 +1,12 @@
 
 """
 # -- --------------------------------------------------------------------------------------------------- -- #
-# -- project: A SHORT DESCRIPTION OF THE PROJECT                                                         -- #
+# -- project: Calculation and Time Series visualization of Market Microstructure indicators.             -- #
 # -- script: data.py : python script for data collection                                                 -- #
-# -- author: YOUR GITHUB USER NAME                                                                       -- #
-# -- license: THE LICENSE TYPE AS STATED IN THE REPOSITORY                                               -- #
-# -- repository: YOUR REPOSITORY URL                                                                     -- #
+# -- author: JuanPablo2019                                                                               -- #
+# -- license: GNU General Public License v3.                                                             -- #
+# -- repository:https://github.com/JuanPablo2019/myst_jprm_lab1.git                                      -- #
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 
-dict_test = {'key_a': 'a', 'key_b': 'b'}
+
