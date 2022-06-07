@@ -114,9 +114,9 @@ def ohlc(pt_data,n_pt_data,v_pt_data):
     return ohlc
 
 def td_imb_pt(pt_data):
-    pt_data2 = pt_data
-    pt_data2['amount']=[j*-1 if i == 'sell' else j for i,j in zip(pt_data2['side'],pt_data2['amount'])]
-    td_imb = pt_data2['amount'].resample('60T').sum()
+    
+    pt_data['amount']=[j*-1 if i == 'sell' else j for i,j in zip(pt_data['side'],pt_data['amount'])]
+    td_imb = pt_data['amount'].resample('60T').sum()
     return td_imb
 
 
