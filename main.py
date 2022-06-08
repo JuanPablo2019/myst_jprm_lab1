@@ -33,3 +33,53 @@ td_imb =td_imb.resample('60T').sum()
 ob_ts = list(dt.ob_data.keys())
 import pandas as pd
 ohlcv = [pd.DataFrame(dt.ob_data[i]) for i in ob_ts]
+
+#%%
+from scipy.stats import moment,skew
+
+#a = skew(data_1['orderbook_imbalance'])
+
+#%%
+book = dt.ob_data[list(dt.ob_data.keys())[0]]
+
+buy_side=book[['bid_size', 'bid']]
+buy_side=buy_side.groupby(['bid']).sum()
+buy_side['side']='buy'
+sell_side=book[['ask_size', 'ask']]
+sell_side=sell_side.groupby(['ask']).sum()
+sell_side['side']='sell'
+
+#%%
+
+
+price_bid = list(buy_side.index)
+price_ask = list(sell_side.index)
+price_levels = price_bid + price_ask
+
+
+s_bid = list(buy_side['bid_size'])
+s_ask = list(sell_side['ask_size'])
+size_levels = s_bid + s_ask
+
+
+b_side = list(buy_side['side'])
+a_side = list(sell_side['side'])
+side_levels = b_side + a_side
+
+
+ob = pd.DataFrame()
+ob['price']=price_levels
+ob['size']=size_levels
+ob['side']=side_levels
+
+#%%
+import plotly.io as pio
+pio.renderers.default = "browser"
+import plotly.express as px
+fig = px.bar(ob,x='price',y='size',color='side')
+fig.show()
+
+
+#%%
+
+fn.plot_orderbook(book)
