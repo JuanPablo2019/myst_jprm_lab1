@@ -16,6 +16,7 @@ import pandas as pd
 from scipy.stats import skew,kurtosis
 import plotly.io as pio
 import plotly.express as px
+from plotly.subplots import make_subplots
 
 # imported data
 data_ob=dt.ob_data
@@ -262,7 +263,7 @@ def plot_orderbook(book):
 #----------------Public Trades Plot-------------------------------------------------------------------------------
 #-----------------------------------------------------------------------------------------------------------------
 
-def plot_plot_publictrades():
+def plot_plot_publictrades(pt_data,begin=0, end=120001):
     """
     Public Trades horizontal bars + traded price plot.
     
@@ -271,12 +272,42 @@ def plot_plot_publictrades():
     
     Parameters
     ----------
+    pt_data: dataframe with public trades containing the following columns.
+        timestamp:
+        price: traded price
+        amount: traded volume
+        side: nature of the operatio buy/sell
+    begin: the number of price where you want to start to visualize
+           by default start from 0.
+    end: the number of price where you want to end the visualization
+         by default begin at the end of the datframe
+         
+        
 
     Returns
+    figure with the 
     -------
     
-    References
-    ---------
+    
 
     """
     
+    pt_n = pt_data.groupby(['time2','price']).sum()
+    pf=pd.DataFrame()
+    pf['time'] = [j[0] for j in [i for i in pt_n.index]]
+    pf['amount']=pt_n.amount.tolist()
+    pf['price']=[j[1] for j in [i for i in pt_n.index]]
+    pf.sort_values(by=['time'], inplace = True)
+
+   
+    #fig = make_subplots(specs=[[{"secondary_y": True}]])
+    #fig = px.bar(pf, x='time',y='amount')
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
+                   vertical_spacing=0.03, subplot_titles=('Public Traded Price', ' Traded Volume'), 
+                   row_width=[0.2, 0.7])
+    
+    fig.add_trace(go.Scatter(mode='lines',x=pf['time'][begin:end],y=pf['price'][begin:end]), row=1, col=1)
+    fig.add_trace(go.Bar(x=pf['time'][begin:end],y=pf['amount'][begin:end]),row=2, col=1)
+    
+    
+    return figure.show()

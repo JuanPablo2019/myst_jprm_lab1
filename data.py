@@ -14,7 +14,7 @@
 
 import pandas as pd
 import json
-import pyarrow as pa
+
 
 
 #%% Orderbook data
@@ -33,9 +33,10 @@ ob_data = {i_ob: pd.DataFrame(ob_data[i_ob])[['bid_size','bid','ask','ask_size']
 
 #%% Public trades data
 
-pt_data = pd.read_csv('btcusdt_binance.csv',header=0)
+pt_data = pd.read_csv('btcusdt_binance.csv',header=0, encoding='utf-8-sig')
 
 #%% public trades data wrangling
 
 pt_data.drop('Unnamed: 0',inplace=True, axis=1)
 pt_data.index = pd.to_datetime(pt_data['timestamp'])
+pt_data['time2']=pt_data['timestamp']

@@ -83,3 +83,31 @@ fig.show()
 #%%
 
 fn.plot_orderbook(book)
+
+#%% test plot public trades
+import plotly.graph_objects as go
+
+pt_data = dt.pt_data.sort_values(by=['time2'])
+pf=pd.DataFrame()
+
+#%%
+
+#%%
+pt_n = pt_data.groupby(['time2','price']).sum()
+pf['time'] = [j[0] for j in [i for i in pt_n.index]]
+pf['amount']=pt_n.amount.tolist()
+pf['price']=[j[1] for j in [i for i in pt_n.index]]
+pf.sort_values(by=['time'], inplace = True)
+#%%
+from plotly.subplots import make_subplots
+#fig = make_subplots(specs=[[{"secondary_y": True}]])
+#fig = px.bar(pf, x='time',y='amount')
+fig = make_subplots(rows=2, cols=1, shared_xaxes=True, 
+               vertical_spacing=0.03, subplot_titles=('Public Traded Price', ' Traded Volume'), 
+               row_width=[0.2, 0.7])
+
+fig.add_trace(go.Scatter(mode='lines',x=pf['time'][0:10000],y=pf['price'][0:10000]), row=1, col=1)
+fig.add_trace(go.Bar(x=pf['time'][0:10000],y=pf['amount'][0:10000]),row=2, col=1)
+
+
+fig.show()
