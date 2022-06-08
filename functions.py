@@ -15,8 +15,8 @@ import data as dt
 import pandas as pd
 
 # imported data
-#data_ob=dt.ob_data
-
+data_ob=dt.ob_data
+pt_data=dt.pt_data
 # función
 
 def f_descriptive_ob(data_ob:dict) -> dict:
@@ -81,26 +81,66 @@ def f_descriptive_ob(data_ob:dict) -> dict:
     # weighted midprice
     ob_wm = [ob_imb[i]*ob_m3[i] for i in range(0,len(ob_ts))]
     
+    # Weighted midprice (B) (TOB) for extrapoints
+    # W-MidPrice-B = [ask_volume/(total_volume)] *bid_price+[bid_volume/(total_volume)]*ask_price
+    # W-MidPrice-B = (v[1]/np.sum(v[0]+v[1]))*p[0]+(v[0]/np.sum(v[0]+v[1]))*p[1]
     #VWAP Volume Weighted Average Price
     
     vwap = [np.sum(data_ob[i]['bid']*data_ob[i]['bid_size'] + data_ob[i]['ask']*data_ob[i]['ask_size'])/np.sum(data_ob[i]['bid_size']+data_ob[i]['ask_size'])
         for i in ob_ts]
     
+    #OHLCV con mid price open, high, low, close, volume (Quoted volume)
+    
+    
     r_data = {'median_ts_ob':ob_m1, 'spread': ob_m2, 'midprice': ob_m3, 'orderbook_imbalance': ob_imb, 'weighted_midprice':ob_wm,
               'Volume Weighted Average Price':vwap}
     
     
+    
+    
     return r_data
 
-def transaction_vol_pt(pt_data):
+#Public trade metrics
+
+def f_publictrades_metrics(data_pt):
+    """
+    
+
+    Parameters
+    ----------
+    data_pt : dict
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    # resampling for 1H
+    # for each period
+    
+    # -- (1) Buy Trade Count -- #
+    b_pt_data =pt_data[pt_data['side']=='buy']['side'].resample('60T').count()
+    # -- (2) Sell Trade Count -- #
+    s_pt_data =pt_data[pt_data['side']=='sell']['side'].resample('60T').count()
+    # -- (3) Total Trade Count -- #
     n_pt_data = pt_data['side'].resample('60T').count()
-    return n_pt_data
-
-def asset_volume_pt(pt_data):
+    # -- (4) Difference in Trade Count (Buy-Sell) -- #
+    diff_pt_data = b_pt_data - s_pt_data
+  
+    # -- (5) Sell Volume  -- #
+    sv_pt_data = pt_data['amount'][pt_data['side']=='sell'].resample('60T').sum()
+    # -- (6) Buy Volume -- #
+    bv_pt_data = pt_data['amount'][pt_data['side']=='buy'].resample('60T').sum()
+    # -- (6) Total Volume -- #
     v_pt_data = pt_data['amount'].resample('60T').sum()
-    return v_pt_data    
+    # -- (4) Difference in Volume (Buy-Sell) -- #
+    diffv_pt_data = bv_pt_data-sv_pt_data
 
-def ohlc(pt_data,n_pt_data,v_pt_data):
+    
+      
+
+
     ohlc = pd.DataFrame()
 
     ohlc['Hour'] = pt_data['price'].resample('60T').last().index
@@ -111,12 +151,20 @@ def ohlc(pt_data,n_pt_data,v_pt_data):
     ohlc['Transaction Volume']=n_pt_data.values
     ohlc['Asset Volume']=v_pt_data.values
     
-    return ohlc
-
-def td_imb_pt(pt_data):
     
-    pt_data['amount']=[j*-1 if i == 'sell' else j for i,j in zip(pt_data['side'],pt_data['amount'])]
-    td_imb = pt_data['amount'].resample('60T').sum()
-    return td_imb
+    
+
+    td_imb = pt_data.apply(lambda x: x[2]*-1 if x[3] == 'sell' else x[2],axis=1).resample('60T').sum()
+    
+    
+    
+    p_data = {'Buy Trade Count': b_pt_data, 'Sell Trade Count':  s_pt_data,
+              'Total Trade Count': n_pt_data, 'Difference in Trade Count': diff_pt_data, 
+              'Total Volume':v_pt_data,'Buy Volume':bv_pt_data,'Sell Volume':sv_pt_data,
+              'Difference in Volume':diffv_pt_data,
+              'OHLCVV':ohlc,'Trade Flow Imbalance': td_imb}
+    
+    return p_data
+    
 
 

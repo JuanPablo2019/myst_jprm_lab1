@@ -9,4 +9,27 @@
 # -- --------------------------------------------------------------------------------------------------- -- #
 """
 
+import data as dt
+import functions as fn
+#from functions import f_publictrades_metrics,f_descriptive_ob
 
+data_1 = fn.f_descriptive_ob(dt.ob_data)
+
+#%% Public trades functions dict output test
+
+data_2 =fn.f_publictrades_metrics(dt.pt_data)
+#%%
+a=pt_data.apply(lambda x: x[2]*-1 if x[3] == 'sell' else x[2],axis=1)
+
+#%%
+td_imb = pt_data.apply(lambda x: x[2]*-1 if x[3] == 'sell' else x[2],axis=1).resample('60T').sum()
+    #td_imb=pd.DataFrame([j*-1 if i == 'sell' else j for i,j in zip(pt_data['side'],pt_data['amount'])]).resample('60T').sum()
+    #pt_data['amount']=[j*-1 if i == 'sell' else j for i,j in zip(pt_data['side'],pt_data['amount'])]
+td_imb =td_imb.resample('60T').sum()
+
+#%%
+#vwap = [np.sum(data_ob[i]['bid']*data_ob[i]['bid_size'] + data_ob[i]['ask']*data_ob[i]['ask_size'])/np.sum(data_ob[i]['bid_size']+data_ob[i]['ask_size'])
+ #       for i in ob_ts]
+ob_ts = list(dt.ob_data.keys())
+import pandas as pd
+ohlcv = [pd.DataFrame(dt.ob_data[i]) for i in ob_ts]
